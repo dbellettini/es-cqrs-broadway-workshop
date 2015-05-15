@@ -82,6 +82,10 @@ class Post extends EventSourcedAggregateRoot
      * @param $category
      */
     public function publish($title, $content, $category) {
+        if ($this->nothingChanged($title, $content, $category)) {
+            return;
+        }
+
         if ($this->category !== $category) {
             if ($this->category !== null) {
                 $this->apply(new PostWasUncategorized($this->id, $this->category));
@@ -141,5 +145,19 @@ class Post extends EventSourcedAggregateRoot
     protected function applyPostWasCategorized(PostWasCategorized $event)
     {
         $this->category = $event->category;
+    }
+
+    protected function applyPostWasPublished(PostWasPublished $event)
+    {
+        $this->title = $event->title;
+        $this->content = $event->content;
+        $this->category = $event->category;
+    }
+
+    private function nothingChanged($title, $content, $category)
+    {
+        return $this->title === $title &&
+            $this->content === $content &&
+            $this->category === $category;
     }
 }

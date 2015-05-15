@@ -134,8 +134,6 @@ class PostTest extends AggregateRootScenarioTestCase
     /** @test */
     public function it_does_not_publish_if_nothing_changed()
     {
-        $this->markTestIncomplete('Post::instantiateForReconstitution does not exist.');
-
         $id = 'my-id';
         $title = 'the title';
         $content = 'the content';
