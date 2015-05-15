@@ -38,8 +38,6 @@ class PostTest extends AggregateRootScenarioTestCase
     /** @test */
     public function it_can_create()
     {
-        $this->markTestIncomplete('Post::create() does not exist.');
-
         $id = 'my-id';
 
         $this->scenario

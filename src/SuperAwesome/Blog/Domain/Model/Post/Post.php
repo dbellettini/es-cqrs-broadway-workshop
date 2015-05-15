@@ -2,7 +2,10 @@
 
 namespace SuperAwesome\Blog\Domain\Model\Post;
 
-class Post
+use Broadway\EventSourcing\EventSourcedAggregateRoot;
+use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCreated;
+
+class Post extends EventSourcedAggregateRoot
 {
     /** @var string */
     private $id;
@@ -101,5 +104,21 @@ class Post
         if (isset($this->tags[$tag])) {
             unset($this->tags[$tag]);
         }
+    }
+
+    public static function create($id)
+    {
+        $instance = new static($id);
+        $instance->apply(new PostWasCreated($id));
+
+        return $instance;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAggregateRootId()
+    {
+        return $this->getId();
     }
 }
