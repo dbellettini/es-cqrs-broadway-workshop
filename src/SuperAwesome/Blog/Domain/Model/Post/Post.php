@@ -3,7 +3,9 @@
 namespace SuperAwesome\Blog\Domain\Model\Post;
 
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
+use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCategorized;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCreated;
+use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasPublished;
 
 class Post extends EventSourcedAggregateRoot
 {
@@ -26,11 +28,9 @@ class Post extends EventSourcedAggregateRoot
     private $status;
 
     /**
-     * @param string $id
      */
-    public function __construct($id)
+    public function __construct()
     {
-        $this->id = $id;
     }
 
     /**
@@ -81,9 +81,11 @@ class Post extends EventSourcedAggregateRoot
      * @param $category
      */
     public function publish($title, $content, $category) {
-        $this->title = $title;
-        $this->content = $content;
-        $this->category = $category;
+        if ($this->category !== $category) {
+            $this->apply(new PostWasCategorized($this->id, $category));
+        }
+
+        $this->apply(new PostWasPublished($this->id, $title, $content, $category));
     }
 
     /**
@@ -114,11 +116,21 @@ class Post extends EventSourcedAggregateRoot
         return $instance;
     }
 
+    public static function instantiateForReconstitution()
+    {
+        return new self();
+    }
+
     /**
      * @return string
      */
     public function getAggregateRootId()
     {
         return $this->getId();
+    }
+
+    protected function applyPostWasCreated(PostWasCreated $event)
+    {
+        $this->id = $event->id;
     }
 }
