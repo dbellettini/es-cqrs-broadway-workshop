@@ -8,6 +8,7 @@ use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCreated;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasPublished;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasTagged;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasUncategorized;
+use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasUntagged;
 
 class Post extends EventSourcedAggregateRoot
 {
@@ -119,6 +120,8 @@ class Post extends EventSourcedAggregateRoot
         if (isset($this->tags[$tag])) {
             unset($this->tags[$tag]);
         }
+
+        $this->apply(new PostWasUntagged($this->id, $tag));
     }
 
     public static function create($id)
