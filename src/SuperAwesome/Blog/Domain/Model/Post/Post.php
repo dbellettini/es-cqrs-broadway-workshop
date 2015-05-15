@@ -82,11 +82,10 @@ class Post extends EventSourcedAggregateRoot
      * @param $category
      */
     public function publish($title, $content, $category) {
-        if ($this->category !== null) {
-            $this->apply(new PostWasUncategorized($this->id, $this->category));
-        }
-
         if ($this->category !== $category) {
+            if ($this->category !== null) {
+                $this->apply(new PostWasUncategorized($this->id, $this->category));
+            }
             $this->apply(new PostWasCategorized($this->id, $category));
         }
 

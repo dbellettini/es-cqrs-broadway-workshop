@@ -106,8 +106,6 @@ class PostTest extends AggregateRootScenarioTestCase
     /** @test */
     public function it_does_not_uncategorize_when_publishing_with_same_category()
     {
-        $this->markTestIncomplete('Post::instantiateForReconstitution does not exist.');
-
         $id = 'my-id';
         $title = 'the title';
         $content = 'the content';
