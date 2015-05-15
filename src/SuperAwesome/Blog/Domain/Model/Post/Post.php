@@ -104,7 +104,7 @@ class Post extends EventSourcedAggregateRoot
      * @param string $tag
      */
     public function addTag($tag) {
-        if (isset($this->tags[$tag])) {
+        if ($this->isTagged($tag)) {
             return;
         }
 
@@ -117,11 +117,10 @@ class Post extends EventSourcedAggregateRoot
      * @param string $tag
      */
     public function removeTag($tag) {
-        if (isset($this->tags[$tag])) {
+        if ($this->isTagged($tag)) {
             unset($this->tags[$tag]);
+            $this->apply(new PostWasUntagged($this->id, $tag));
         }
-
-        $this->apply(new PostWasUntagged($this->id, $tag));
     }
 
     public static function create($id)
@@ -167,10 +166,20 @@ class Post extends EventSourcedAggregateRoot
         $this->tags[$event->tag] = true;
     }
 
+    protected function applyPostWasUntagged(PostWasUntagged $event)
+    {
+        unset($this->tags[$event->tag]);
+    }
+
     private function nothingChanged($title, $content, $category)
     {
         return $this->title === $title &&
             $this->content === $content &&
             $this->category === $category;
+    }
+
+    private function isTagged($tag)
+    {
+        return isset($this->tags[$tag]);
     }
 }
