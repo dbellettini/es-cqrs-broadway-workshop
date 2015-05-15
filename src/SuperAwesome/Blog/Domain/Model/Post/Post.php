@@ -6,6 +6,7 @@ use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCategorized;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCreated;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasPublished;
+use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasTagged;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasUncategorized;
 
 class Post extends EventSourcedAggregateRoot
@@ -102,7 +103,7 @@ class Post extends EventSourcedAggregateRoot
      * @param string $tag
      */
     public function addTag($tag) {
-        $this->tags[$tag] = true;
+        $this->apply(new PostWasTagged($this->id, $tag));
     }
 
     /**
@@ -152,6 +153,11 @@ class Post extends EventSourcedAggregateRoot
         $this->title = $event->title;
         $this->content = $event->content;
         $this->category = $event->category;
+    }
+
+    protected function applyPostWasTagged(PostWasTagged $event)
+    {
+        $this->tags[$event->tag] = true;
     }
 
     private function nothingChanged($title, $content, $category)
