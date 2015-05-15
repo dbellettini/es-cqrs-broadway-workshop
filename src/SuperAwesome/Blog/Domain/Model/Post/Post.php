@@ -103,6 +103,10 @@ class Post extends EventSourcedAggregateRoot
      * @param string $tag
      */
     public function addTag($tag) {
+        if (isset($this->tags[$tag])) {
+            return;
+        }
+
         $this->apply(new PostWasTagged($this->id, $tag));
     }
 
