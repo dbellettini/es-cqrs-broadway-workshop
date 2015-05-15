@@ -6,6 +6,7 @@ use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCategorized;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasCreated;
 use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasPublished;
+use SuperAwesome\Blog\Domain\Model\Post\Event\PostWasUncategorized;
 
 class Post extends EventSourcedAggregateRoot
 {
@@ -81,6 +82,10 @@ class Post extends EventSourcedAggregateRoot
      * @param $category
      */
     public function publish($title, $content, $category) {
+        if ($this->category !== null) {
+            $this->apply(new PostWasUncategorized($this->id, $this->category));
+        }
+
         if ($this->category !== $category) {
             $this->apply(new PostWasCategorized($this->id, $category));
         }
@@ -132,5 +137,10 @@ class Post extends EventSourcedAggregateRoot
     protected function applyPostWasCreated(PostWasCreated $event)
     {
         $this->id = $event->id;
+    }
+
+    protected function applyPostWasCategorized(PostWasCategorized $event)
+    {
+        $this->category = $event->category;
     }
 }
